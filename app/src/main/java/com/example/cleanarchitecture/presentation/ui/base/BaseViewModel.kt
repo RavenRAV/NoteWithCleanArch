@@ -1,4 +1,4 @@
-package com.example.cleanarchitecture.presentation.base
+package com.example.cleanarchitecture.presentation.ui.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -3,7 +3,7 @@ package com.example.cleanarchitecture.presentation.ui.add_edit_note
 import com.example.cleanarchitecture.domain.model.Note
 import com.example.cleanarchitecture.domain.usecase.CreateNoteUseCase
 import com.example.cleanarchitecture.domain.usecase.EditNoteUseCase
-import com.example.cleanarchitecture.presentation.base.BaseViewModel
+import com.example.cleanarchitecture.presentation.ui.base.BaseViewModel
 import com.example.cleanarchitecture.presentation.utils.UIState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

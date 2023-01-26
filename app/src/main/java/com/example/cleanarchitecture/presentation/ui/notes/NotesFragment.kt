@@ -1,26 +1,32 @@
 package com.example.cleanarchitecture.presentation.ui.notes
 
-import android.os.Bundle
-import android.view.View
-import android.widget.Toast
-import androidx.fragment.app.Fragment
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.cleanarchitecture.R
 import com.example.cleanarchitecture.databinding.FragmentNotesBinding
-import com.example.cleanarchitecture.presentation.base.BaseFragment
-import com.example.cleanarchitecture.presentation.utils.UIState
+import com.example.cleanarchitecture.presentation.ui.adapters.NotesAdapter
+import com.example.cleanarchitecture.presentation.ui.base.BaseFragment
+import com.example.cleanarchitecture.presentation.extention.showToast
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class NotesFragment : BaseFragment<FragmentNotesBinding, NotesViewModel>(R.layout.fragment_notes) {
 
     override val binding by viewBinding(FragmentNotesBinding::bind)
     override val viewModel by viewModels<NotesViewModel>()
+    private val notesAdapter by lazy { NotesAdapter() }
+
+    override fun initialize() {
+        with(binding.notesRecycler){
+        layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            adapter = notesAdapter
+        }
+
+    }
 
     override fun setupRequest() {
         viewModel.getAllNotes()
@@ -28,14 +34,35 @@ class NotesFragment : BaseFragment<FragmentNotesBinding, NotesViewModel>(R.layou
 
     override fun setupSubscribers() {
         viewModel.getAllNotesState.collectState(
-            onLoading = {},
-            onSuccess = {})
+            onError = {
+//                showToast(it)
+//                binding.notesProgress.isVisible = false
+            },
+            onLoading = {
+                        binding.notesProgress.isVisible = true
+            },
+            onSuccess = {
+                notesAdapter.submitList(it)
+                binding.notesProgress.isVisible = false
+            })
 
         viewModel.deleteNoteState.collectState(
-            onLoading = {},
+            onError = {
+                showToast(it)
+                binding.notesProgress.isVisible = false
+            },
+            onLoading = {
+                binding.notesProgress.isVisible = true
+            },
             onSuccess = {
-                Toast.makeText(requireContext(), "Successfully deleted", Toast.LENGTH_SHORT).show()
+                showToast(R.string.deleted_successfully)
             })
+    }
+
+    override fun setupListeners() {
+        binding.notesAddButton.setOnClickListener {
+            findNavController().navigate(R.id.action_notesFragment_to_addEditFragment)
+        }
     }
 
 

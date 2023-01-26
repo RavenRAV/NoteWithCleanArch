@@ -1,8 +1,7 @@
-package com.example.cleanarchitecture.presentation.base
+package com.example.cleanarchitecture.presentation.ui.base
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -10,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewbinding.ViewBinding
-import by.kirich1409.viewbindingdelegate.viewBinding
+import com.example.cleanarchitecture.presentation.extention.showToast
 import com.example.cleanarchitecture.presentation.utils.UIState
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -45,8 +44,7 @@ abstract class BaseFragment<VB : ViewBinding, VM : ViewModel>(@LayoutRes layoutI
                         is UIState.Error -> {
                             if (onError != null) onError(state.message)
                             else
-                                Toast.makeText(requireContext(), state.message, Toast.LENGTH_SHORT)
-                                    .show()
+                                showToast(state.message)
                         }
                         is UIState.Empty -> {}
                         is UIState.Loading -> onLoading
