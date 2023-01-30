@@ -9,5 +9,5 @@ data class NoteEntity (
     val id: Int,
     val title: String,
     val description: String,
-    val createAt: String
+    val createAt: Long
         )

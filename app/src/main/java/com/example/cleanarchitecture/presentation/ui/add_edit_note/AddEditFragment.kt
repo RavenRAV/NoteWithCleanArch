@@ -8,8 +8,11 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.cleanarchitecture.R
 import com.example.cleanarchitecture.databinding.FragmentAddEditBinding
 import com.example.cleanarchitecture.domain.model.Note
+import com.example.cleanarchitecture.presentation.extention.convertLongToTime
 import com.example.cleanarchitecture.presentation.ui.base.BaseFragment
+import com.example.cleanarchitecture.presentation.ui.notes.NotesFragment
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -20,22 +23,41 @@ class AddEditFragment :
 
     override val binding by viewBinding(FragmentAddEditBinding::bind)
     override val viewModel by viewModels<AddEditViewModel>()
+    private var note: Note? = null
+
+    override fun initialize() {
+        if (note != null) {
+        note = arguments?.getSerializable(NotesFragment.NF_AEF_NOTE) as Note
+            binding.addTitle.setText(note!!.title)
+            binding.addDescription.setText(note!!.description)
+        }
+    }
 
     override fun setupListeners() {
         with(binding) {
             addButton.setOnClickListener {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (note == null) {
                     viewModel.createNote(
                         Note(
                             title = addTitle.text.toString(),
                             description = addDescription.text.toString(),
-                            createAt = LocalDate.now().toString()
-    //                        with(Calendar.getInstance()){
-    //                            "${get(Calendar.DAY_OF_MONTH)} ${get(Calendar.MONTH)+1} ${get(Calendar.YEAR)} "
-    //                        }
-    //                        System.currentTimeMillis()
+                            createAt = System.currentTimeMillis()
+//                            createAt = LocalDate.now().toString()
+//                        with(Calendar.getInstance()){
+//                            "${get(Calendar.DAY_OF_MONTH)} ${get(Calendar.MONTH)+1} ${get(Calendar.YEAR)} "
+//                        }
                         )
                     )
+                } else {
+                    viewModel.editNote(
+                        Note(
+                            id = note!!.id,
+                            title = addTitle.text.toString(),
+                            description = addDescription.text.toString(),
+                            createAt = System.currentTimeMillis()
+                        )
+                    )
+
                 }
             }
         }
@@ -43,6 +65,14 @@ class AddEditFragment :
 
     override fun setupSubscribers() {
         viewModel.createNoteState.collectState(
+            onLoading = {},
+            onError = {},
+            onSuccess = {
+                findNavController().navigateUp()
+            }
+        )
+
+        viewModel.editNoteState.collectState(
             onLoading = {},
             onError = {},
             onSuccess = {

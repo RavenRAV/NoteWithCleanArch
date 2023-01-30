@@ -6,21 +6,18 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.cleanarchitecture.databinding.ItemNoteBinding
 import com.example.cleanarchitecture.domain.model.Note
+import com.example.cleanarchitecture.presentation.extention.convertLongToTime
+import com.example.cleanarchitecture.presentation.extention.titlecaseFirstChar
 
-class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder>() {
-    private var list = listOf<Note>()
+class NotesAdapter(
+    private val onClick: (Note) -> Unit,
+    private val onLongClick: (Note) -> Unit
+) : RecyclerView.Adapter<NotesAdapter.NoteViewHolder>() {
+    private var list = ArrayList<Note>()
 
-    fun submitList(list: List<Note>){
+    fun submitList(list: ArrayList<Note>){
         this.list = list
         notifyDataSetChanged()
-    }
-
-    class NoteViewHolder(private val binding: ItemNoteBinding) : ViewHolder(binding.root) {
-        fun bind(note: Note) {
-            binding.tvTitle.text = note.title
-            binding.tvDescription.text = note.description
-            binding.tvTime.text = note.createAt.toString()
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
@@ -38,5 +35,25 @@ class NotesAdapter : RecyclerView.Adapter<NotesAdapter.NoteViewHolder>() {
     }
 
     override fun getItemCount() = list.size
+
+
+    inner class NoteViewHolder(private val binding: ItemNoteBinding) : ViewHolder(binding.root) {
+        fun bind(note: Note) {
+            binding.tvTitle.text = note.title.titlecaseFirstChar()
+            binding.tvDescription.text = note.description.titlecaseFirstChar()
+            binding.tvTime.text = note.createAt.convertLongToTime()
+
+            itemView.setOnClickListener {
+                onClick.invoke(note)
+            }
+
+            itemView.setOnLongClickListener {
+                onLongClick.invoke(note)
+                list.remove(note)
+                notifyDataSetChanged()
+                true
+            }
+        }
+    }
 
 }
