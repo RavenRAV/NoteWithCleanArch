@@ -1,5 +1,7 @@
 package com.example.cleanarchitecture.presentation.ui.adapters
 
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -48,9 +50,23 @@ class NotesAdapter(
             }
 
             itemView.setOnLongClickListener {
-                onLongClick.invoke(note)
-                list.remove(note)
-                notifyDataSetChanged()
+                val builder = AlertDialog.Builder(it.context)
+        builder.setTitle("Are you sure you want to delete this task?")
+
+        builder.setPositiveButton("Yes", fun(_: DialogInterface, _: Int) {
+
+            onLongClick.invoke(note)
+            list.remove(note)
+            notifyDataSetChanged()
+
+        })
+
+        builder.setNegativeButton("Cancel"){
+                _, _ -> builder.setCancelable(true)
+        }
+
+        builder.create()
+        builder.show()
                 true
             }
         }

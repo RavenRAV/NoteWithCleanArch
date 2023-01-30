@@ -26,8 +26,11 @@ class AddEditFragment :
     private var note: Note? = null
 
     override fun initialize() {
+        val arguments = arguments
+        if (arguments !=null){
+            note = arguments.getSerializable(NotesFragment.NF_AEF_NOTE) as Note
+        }
         if (note != null) {
-        note = arguments?.getSerializable(NotesFragment.NF_AEF_NOTE) as Note
             binding.addTitle.setText(note!!.title)
             binding.addDescription.setText(note!!.description)
         }
@@ -42,10 +45,6 @@ class AddEditFragment :
                             title = addTitle.text.toString(),
                             description = addDescription.text.toString(),
                             createAt = System.currentTimeMillis()
-//                            createAt = LocalDate.now().toString()
-//                        with(Calendar.getInstance()){
-//                            "${get(Calendar.DAY_OF_MONTH)} ${get(Calendar.MONTH)+1} ${get(Calendar.YEAR)} "
-//                        }
                         )
                     )
                 } else {
